@@ -6,7 +6,7 @@
 
 function App() {
   return (
-  <h1>USCOM</h1>
+  <h1 className="flex justify-center">USCOM</h1>
   );
 }
 

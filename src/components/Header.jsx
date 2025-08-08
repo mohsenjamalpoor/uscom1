@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaClinicMedical, FaBookMedical, FaFileAlt } from 'react-icons/fa';
+import { FaClinicMedical, FaFileAlt } from 'react-icons/fa';
  
 export default function Header({ darkMode, setDarkMode }) {
   return (
@@ -15,10 +15,7 @@ export default function Header({ darkMode, setDarkMode }) {
             <FaClinicMedical />
             <span>Dashboard</span>
           </Link>
-          <Link to="/cases" className="flex items-center space-x-1 hover:text-blue-500">
-            <FaBookMedical />
-            <span>Case Studies</span>
-          </Link>
+         
           <Link to="/docs" className="flex items-center space-x-1 hover:text-blue-500">
             <FaFileAlt />
             <span>Documentation</span>

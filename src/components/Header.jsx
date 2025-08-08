@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FaClinicMedical, FaFileAlt } from 'react-icons/fa';
+import { TiWeatherSunny } from "react-icons/ti";
+import { FaMoon } from "react-icons/fa";
  
 export default function Header({ darkMode, setDarkMode }) {
   return (
@@ -26,7 +28,7 @@ export default function Header({ darkMode, setDarkMode }) {
             className={`p-2 rounded-full ${darkMode ? 'bg-gray-700' : 'bg-gray-200'}`}
             aria-label="Toggle dark mode"
           >
-            {darkMode ? '☀️' : '🌙'}
+            {darkMode ? <TiWeatherSunny /> : <FaMoon />}
           </button>
         </nav>
       </div>

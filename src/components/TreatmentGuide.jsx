@@ -1,4 +1,4 @@
-import { FaTint, FaSyringe, FaHeartbeat } from 'react-icons/fa';
+import { FaTint, FaSyringe, FaHeartbeat, FaBolt } from 'react-icons/fa';
 import useHemodynamic from '../hooks/useHemodynamic';
 
 export default function TreatmentGuide({ parameters, patient, darkMode }) {
@@ -12,7 +12,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
 
     const patientWeight = parseFloat(patient.weight);
     if (isNaN(patientWeight) || patientWeight <= 0) {
-      return null; // وزن معتبر نیست
+      return null;
     }
 
     return {
@@ -99,6 +99,33 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           text: "نیاز فعلی ندارد",
           dose: "عدم تجویز",
           rationale: "عدم نشانه‌های واضح برای اینوتروپ"
+        };
+      }
+    },
+    adrenaline: {
+      icon: <FaBolt className="text-yellow-500" />,
+      title: "اپی‌نفرین",
+      getRecommendation: () => {
+        if (status.type === 'Hypodynamic' && ci < 2.0 && smii < 1.2) {
+          const dose = calculateDose('0.01-0.1 mcg/kg/min');
+          return {
+            text: "شروع اپی‌نفرین",
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
+            rationale: `CI پایین (${ci}) و SMII پایین (${smii}) نشان‌دهنده نیاز به حمایت اینوتروپ قوی`
+          };
+        }
+        if (status.type === 'Hypodynamic' && spO2 < 90) {
+          const dose = calculateDose('0.05-0.2 mcg/kg/min');
+          return {
+            text: "اپی‌نفرین ممکن است کمک کند",
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
+            rationale: `اشباع اکسیژن پایین (${spO2}%) همراه با کاهش پرفیوژن`
+          };
+        }
+        return {
+          text: "نیاز فعلی ندارد",
+          dose: "عدم تجویز",
+          rationale: "عدم نشانه‌های واضح برای اپی‌نفرین"
         };
       }
     }

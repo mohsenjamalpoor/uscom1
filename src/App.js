@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 
 import Dashboard from './pages/Dashboard';
-import CaseStudies from './pages/CaseStudies';
+
 import Documentation from './pages/Documentation';
 import Header from './components/Header';
  
@@ -15,7 +15,7 @@ function App() {
         <Header darkMode={darkMode} setDarkMode={setDarkMode} />
         <Routes>
           <Route path="/" element={<Dashboard darkMode={darkMode} />} />
-          <Route path="/cases" element={<CaseStudies darkMode={darkMode} />} />
+      
           <Route path="/docs" element={<Documentation darkMode={darkMode} />} />
         </Routes>
       </Router>

@@ -4,22 +4,20 @@ import useHemodynamic from '../hooks/useHemodynamic';
 export default function TreatmentGuide({ parameters, patient, darkMode }) {
   const { status, parameters: { md, svr, ci, smii, ftc, spO2 } } = useHemodynamic(parameters);
 
-  // تابع محاسبه دوز بر اساس بازه و وزن بیمار
   const calculateDose = (doseRange) => {
-    // doseRange باید به شکل "min-max" بدون واحد باشه، مثلا "10-20"
-    // پس اول واحدها رو حذف می‌کنیم (مثل "10-20 ml/kg" -> "10-20")
     const cleanRange = doseRange.replace(/[^\d\-\.]/g, '');
     const [minStr, maxStr] = cleanRange.split('-');
     const min = parseFloat(minStr);
     const max = parseFloat(maxStr);
 
-    // وزن بیمار را عددی می‌کنیم، اگر معتبر نبود 70 فرض می‌کنیم
     const patientWeight = parseFloat(patient.weight);
-    const weight = (isNaN(patientWeight) || patientWeight <= 0) ? 70 : patientWeight;
+    if (isNaN(patientWeight) || patientWeight <= 0) {
+      return null; // وزن معتبر نیست
+    }
 
     return {
-      min: (min * weight).toFixed(1),
-      max: (max * weight).toFixed(1)
+      min: (min * patientWeight).toFixed(1),
+      max: (max * patientWeight).toFixed(1)
     };
   };
 
@@ -32,7 +30,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           const dose = calculateDose('10-20 ml/kg');
           return {
             text: "نیاز فوری به مایع درمانی",
-            dose: `${dose.min} - ${dose.max} ml نرمال سالین`,
+            dose: dose ? `${dose.min} - ${dose.max} ml نرمال سالین` : "وزن بیمار نامشخص",
             rationale: `FTC پایین (${ftc} ms) و وضعیت ${status.text}`
           };
         }
@@ -58,7 +56,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           const dose = calculateDose('0.05-0.3 mcg/kg/min');
           return {
             text: "شروع نوراپی‌نفرین",
-            dose: `${dose.min} - ${dose.max} mcg/min`,
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
             rationale: `SVR پایین (${svr}) و وضعیت ${status.text}`
           };
         }
@@ -66,7 +64,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           const dose = calculateDose('0.02-0.1 mcg/kg/min');
           return {
             text: "ممکن است نیاز باشد",
-            dose: `${dose.min} - ${dose.max} mcg/min`,
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
             rationale: `SVR بالا (${svr}) و SMII مناسب (${smii})`
           };
         }
@@ -85,7 +83,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           const dose = calculateDose('5-10 mcg/kg/min');
           return {
             text: "شروع دوپامین",
-            dose: `${dose.min} - ${dose.max} mcg/min`,
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
             rationale: `SMII پایین (${smii}) و وضعیت ${status.text}`
           };
         }
@@ -93,7 +91,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           const dose = calculateDose('2-5 mcg/kg/min');
           return {
             text: "دوپامین ممکن است مفید باشد",
-            dose: `${dose.min} - ${dose.max} mcg/min`,
+            dose: dose ? `${dose.min} - ${dose.max} mcg/min` : "وزن بیمار نامشخص",
             rationale: `CI پایین (${ci}) و وضعیت ${status.text}`
           };
         }

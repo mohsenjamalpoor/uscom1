@@ -1,13 +1,26 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
 
-
-
-
-
-
+import Dashboard from './pages/Dashboard';
+import CaseStudies from './pages/CaseStudies';
+import Documentation from './pages/Documentation';
+import Header from './components/Header';
+ 
 function App() {
+  const [darkMode, setDarkMode] = useState(false);
+  
   return (
-  <h1 className="flex justify-center">USCOM</h1>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+      <Router>
+        <Header darkMode={darkMode} setDarkMode={setDarkMode} />
+        <Routes>
+          <Route path="/" element={<Dashboard darkMode={darkMode} />} />
+          <Route path="/cases" element={<CaseStudies darkMode={darkMode} />} />
+          <Route path="/docs" element={<Documentation darkMode={darkMode} />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
-
+ 
 export default App;

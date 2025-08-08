@@ -101,7 +101,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       <div className={`p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
         <h2 className="text-xl font-bold flex items-center">
           <FaSyringe className="mr-2" />
-راهنمای درمانی برای بیمار: {patient.name}
+راهنمای درمانی برای بیمار {patient.name}
         </h2>
       </div>
       

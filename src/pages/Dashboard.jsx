@@ -52,6 +52,7 @@ export default function Dashboard({ darkMode }) {
   };
 
   // تابع نمایش سن به صورت "سال و ماه"
+
   const formatAge = (years, months) => {
     const y = parseInt(years);
     const m = parseInt(months);
@@ -69,6 +70,7 @@ export default function Dashboard({ darkMode }) {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
         {/* ستون سمت چپ: ورودی وزن و سن + وضعیت همودینامیک */}
         <div className="lg:col-span-1 space-y-6">
           <div
@@ -115,7 +117,7 @@ export default function Dashboard({ darkMode }) {
                 value={patient.weight}
                 onChange={(e) => handlePatientWeightChange(e.target.value)}
                 className="w-full p-2 rounded border border-gray-300 dark:border-gray-600 text-black"
-                placeholder="مثلاً 75"
+                placeholder="وزن را وارد کنید..."
               />
             </div>
           </div>

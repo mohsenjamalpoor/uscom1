@@ -1,10 +1,11 @@
-// utils/getNormalRangeByAge.js
 import { pulmonaryData_0_6, pulmonaryData_7_16 } from "../data/pulmonary";
 
 export default function getNormalRangeByAge(ageYears, ageMonths) {
-  const totalMonths = (parseInt(ageYears) || 0) * 12 + (parseInt(ageMonths) || 0);
+  const totalMonths =
+    (parseInt(ageYears) || 0) * 12 + (parseInt(ageMonths) || 0);
 
-  if (totalMonths <= 72) { // تا 6 سال
+  if (totalMonths <= 72) {
+    // تا 6 سال
     const dataset = pulmonaryData_0_6;
     // پیدا کردن نزدیک‌ترین رکورد
     let match = dataset[0];
@@ -27,7 +28,8 @@ export default function getNormalRangeByAge(ageYears, ageMonths) {
     return match;
   }
 
-  if (totalMonths <= 192) { // 7 تا 16 سال
+  if (totalMonths <= 192) {
+    // 7 تا 16 سال
     const dataset = pulmonaryData_7_16;
     let match = dataset[0];
     for (let i = 0; i < dataset.length; i++) {
@@ -45,6 +47,6 @@ export default function getNormalRangeByAge(ageYears, ageMonths) {
     age: "بزرگسال",
     co: "4.0 - 8.0",
     sv: "60 - 100",
-    hr: "60 - 100"
+    hr: "60 - 100",
   };
 }

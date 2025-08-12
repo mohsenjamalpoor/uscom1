@@ -15,18 +15,32 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
   
   const { 
     status, 
-    parameters: { 
-      md, 
-      svr, 
-      ci, 
-      smii, 
-      ftc, 
-      spO2,
-      hr,
-      map,
-      do2
-    } 
+    parameters: hemodynamicParams 
   } = useHemodynamic(parameters);
+
+  // Destructure all parameters with default values
+  const {
+    md = null,
+    svr = null,
+    ci = null,
+    smii = null,
+    ftc = null,
+    spO2 = null,
+    hr = null,
+    map = null,
+    do2 = null
+  } = hemodynamicParams || {};
+
+  // Helper function to check if a value is a valid number
+  const isValidNumber = (value) => {
+    return value !== null && value !== undefined && typeof value === 'number';
+  };
+
+  // Helper function to format parameter values
+  const formatParam = (value) => {
+    if (!isValidNumber(value)) return "نامشخص";
+    return value;
+  };
 
   // بررسی معتبر بودن وزن بیمار
   const isValidWeight = () => {
@@ -63,12 +77,17 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
     return `${dose.min} - ${dose.max} ${unit}`;
   };
 
+  // Function to determine if recommendation should be shown
+  const shouldShowRecommendation = (requiredParams) => {
+    return requiredParams.every(param => isValidNumber(param));
+  };
+
   const recommendations = {
     fluids: {
       icon: <FaTint className="text-blue-500" />,
       title: "مایع درمانی",
       getRecommendation: () => {
-        if (status.type === 'Hypodynamic' && ftc < 330) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([ftc]) && ftc < 330) {
           const dose = calculateDose('10-20 ml/kg');
           return {
             text: "نیاز فوری به مایع درمانی",
@@ -77,7 +96,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (status.type === 'Hyperdynamic' && svr < 800) {
+        if (status.type === 'Hyperdynamic' && shouldShowRecommendation([svr]) && svr < 800) {
           return {
             text: "مایع درمانی محافظه‌کارانه",
             dose: "حفظ تعادل مایع",
@@ -98,7 +117,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaSyringe className="text-red-500" />,
       title: "نوراپی‌نفرین",
       getRecommendation: () => {
-        if (status.type === 'Hyperdynamic' && svr < 800 && map < 65) {
+        if (status.type === 'Hyperdynamic' && shouldShowRecommendation([svr, map]) && svr < 800 && map < 65) {
           const dose = calculateDose('0.05-0.3 mcg/kg/min');
           return {
             text: "شروع نوراپی‌نفرین فوری",
@@ -107,7 +126,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (status.type === 'Hypodynamic' && smii > 1.2 && svr > 1600) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([smii, svr]) && smii > 1.2 && svr > 1600) {
           const dose = calculateDose('0.02-0.1 mcg/kg/min');
           return {
             text: "نوراپی‌نفرین ممکن است نیاز باشد",
@@ -129,7 +148,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaHeart className="text-pink-500" />,
       title: "دوبوتامین",
       getRecommendation: () => {
-        if (status.type === 'Hypodynamic' && smii < 1.2 && svr > 1200) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([smii, svr]) && smii < 1.2 && svr > 1200) {
           const dose = calculateDose('2-20 mcg/kg/min');
           return {
             text: "شروع دوبوتامین",
@@ -138,7 +157,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (ci < 2.2 && smii < 1.4) {
+        if (shouldShowRecommendation([ci, smii]) && ci < 2.2 && smii < 1.4) {
           const dose = calculateDose('5-10 mcg/kg/min');
           return {
             text: "دوبوتامین ممکن است مفید باشد",
@@ -160,7 +179,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaHeartbeat className="text-purple-500" />,
       title: "دوپامین",
       getRecommendation: () => {
-        if (status.type === 'Hypodynamic' && smii < 1.0 && hr < 60) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([smii, hr]) && smii < 1.0 && hr < 60) {
           const dose = calculateDose('5-20 mcg/kg/min');
           return {
             text: "شروع دوپامین",
@@ -169,7 +188,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (status.type === 'Hypodynamic' && ci < 2.0) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([ci]) && ci < 2.0) {
           const dose = calculateDose('2-10 mcg/kg/min');
           return {
             text: "دوپامین با دوز پایین",
@@ -191,7 +210,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaBolt className="text-yellow-500" />,
       title: "اپی‌نفرین",
       getRecommendation: () => {
-        if (status.type === 'Hypodynamic' && ci < 1.8 && smii < 1.0) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([ci, smii]) && ci < 1.8 && smii < 1.0) {
           const dose = calculateDose('0.01-0.1 mcg/kg/min');
           return {
             text: "شروع اپی‌نفرین فوری",
@@ -200,7 +219,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (status.type === 'Hypodynamic' && spO2 < 90 && do2 < 300) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([spO2, do2]) && spO2 < 90 && do2 < 300) {
           const dose = calculateDose('0.05-0.2 mcg/kg/min');
           return {
             text: "اپی‌نفرین برای اکسیژن رسانی",
@@ -222,7 +241,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaFlask className="text-green-500" />,
       title: "میلرینون",
       getRecommendation: () => {
-        if (status.type === 'Hypodynamic' && smii < 1.2 && svr > 1800) {
+        if (status.type === 'Hypodynamic' && shouldShowRecommendation([smii, svr]) && smii < 1.2 && svr > 1800) {
           const dose = calculateDose('0.25-0.75 mcg/kg/min');
           return {
             text: "شروع میلرینون",
@@ -231,7 +250,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (ci < 2.0 && smii < 1.4) {
+        if (shouldShowRecommendation([ci, smii]) && ci < 2.0 && smii < 1.4) {
           const dose = calculateDose('0.1-0.5 mcg/kg/min');
           return {
             text: "میلرینون ممکن است مفید باشد",
@@ -253,7 +272,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaProcedures className="text-indigo-500" />,
       title: "وازوپرسین",
       getRecommendation: () => {
-        if (status.type === 'Hyperdynamic' && svr < 700 && map < 60) {
+        if (status.type === 'Hyperdynamic' && shouldShowRecommendation([svr, map]) && svr < 700 && map < 60) {
           return {
             text: "وازوپرسین به نوراپی‌نفرین اضافه شود",
             dose: "0.01-0.04 units/min",
@@ -261,7 +280,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (svr < 800 && status.type === 'Hyperdynamic') {
+        if (status.type === 'Hyperdynamic' && shouldShowRecommendation([svr]) && svr < 800) {
           return {
             text: "وازوپرسین ممکن است کمک کند",
             dose: "0.01-0.02 units/min",
@@ -282,7 +301,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaPills className="text-cyan-500" />,
       title: "نیتروگلیسیرین",
       getRecommendation: () => {
-        if (svr > 2000 && map > 100) {
+        if (shouldShowRecommendation([svr, map]) && svr > 2000 && map > 100) {
           const dose = calculateDose('0.1-0.5 mcg/kg/min');
           return {
             text: "شروع نیتروگلیسیرین",
@@ -291,7 +310,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (svr > 1600 && smii > 1.4) {
+        if (shouldShowRecommendation([svr, smii]) && svr > 1600 && smii > 1.4) {
           const dose = calculateDose('0.1-0.3 mcg/kg/min');
           return {
             text: "نیتروگلیسیرین ممکن است کمک کند",
@@ -313,7 +332,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
       icon: <FaVial className="text-orange-500" />,
       title: "فوروزماید",
       getRecommendation: () => {
-        if (ftc > 440 && status.type === 'Hyperdynamic') {
+        if (status.type === 'Hyperdynamic' && shouldShowRecommendation([ftc]) && ftc > 440) {
           const dose = calculateDose('0.5-1 mg/kg');
           return {
             text: "تجویز فوروزماید",
@@ -322,7 +341,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
             priority: 1
           };
         }
-        if (ftc > 400 && ci > 3.5) {
+        if (shouldShowRecommendation([ftc, ci]) && ftc > 400 && ci > 3.5) {
           const dose = calculateDose('0.3-0.6 mg/kg');
           return {
             text: "فوروزماید ممکن است نیاز باشد",

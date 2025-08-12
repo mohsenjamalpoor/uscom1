@@ -1,58 +1,76 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import ParameterCard from "../components/ParameterCard";
 import HemodynamicStatus from "../components/HemodynamicStatus";
 import TreatmentGuide from "../components/TreatmentGuide";
+import {normalRangesByAge} from "../data/normalRangesByAge.js"
 
 import { initialParameters } from "../data/parameters";
 import { FaNotesMedical } from "react-icons/fa";
 
 export default function Dashboard({ darkMode }) {
-  const [parameters, setParameters] = useState(initialParameters);
+  const [parameters, setParameters] = useState(
+    initialParameters.map((p) => ({ ...p, isCritical: false }))
+  );
 
   const [patient, setPatient] = useState({
-    ageYears: "", // سال
-    ageMonths: "", // ماه
+    ageYears: "",
+    ageMonths: "",
     weight: "",
-    diagnosis: "",
+    diagnosis: ""
   });
 
-  const handleParameterChange = (id, newValue) => {
-    setParameters((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, value: parseFloat(newValue) } : p))
-    );
-  };
+  // بررسی مقدار جدید و تعیین isCritical
+ const handleParameterChange = (id, newValue) => {
+  setParameters((prev) =>
+    prev.map((p) => {
+      if (p.id !== id) return p;
+
+      const value = newValue === "" ? "" : parseFloat(newValue);
+      const ranges = normalRangesByAge(patient.ageYears || 0, patient.ageMonths || 0);
+      const normalRange = ranges[p.title] || [null, null];
+
+      let isCritical = false;
+      if (value !== "" && !isNaN(value) && normalRange[0] !== null) {
+        isCritical = value < normalRange[0] || value > normalRange[1];
+      }
+
+      return { ...p, value, normalRange: normalRange.join("-"), isCritical };
+    })
+  );
+};
+
+useEffect(() => {
+  const ranges = normalRangesByAge(patient.ageYears || 0, patient.ageMonths || 0);
+  setParameters((prev) =>
+    prev.map((p) => {
+      const normalRange = ranges[p.title] || [null, null];
+      let isCritical = false;
+      if (p.value !== "" && !isNaN(p.value) && normalRange[0] !== null) {
+        isCritical = p.value < normalRange[0] || p.value > normalRange[1];
+      }
+      return { ...p, normalRange: normalRange.join("-"), isCritical };
+    })
+  );
+}, [patient.ageYears, patient.ageMonths]);
 
   const handlePatientWeightChange = (value) => {
     if (value === "" || (/^\d+\.?\d*$/.test(value) && Number(value) >= 0)) {
-      setPatient((prev) => ({
-        ...prev,
-        weight: value,
-      }));
+      setPatient((prev) => ({ ...prev, weight: value }));
     }
   };
 
   const handleAgeYearsChange = (value) => {
-    // اجازه فقط اعداد 0 تا 120
     if (value === "" || (Number(value) >= 0 && Number(value) <= 120)) {
-      setPatient((prev) => ({
-        ...prev,
-        ageYears: value,
-      }));
+      setPatient((prev) => ({ ...prev, ageYears: value }));
     }
   };
 
   const handleAgeMonthsChange = (value) => {
-    // اجازه فقط اعداد 0 تا 11
     if (value === "" || (Number(value) >= 0 && Number(value) <= 11)) {
-      setPatient((prev) => ({
-        ...prev,
-        ageMonths: value,
-      }));
+      setPatient((prev) => ({ ...prev, ageMonths: value }));
     }
   };
-
-  // تابع نمایش سن به صورت "سال و ماه"
 
   const formatAge = (years, months) => {
     const y = parseInt(years);
@@ -71,7 +89,7 @@ export default function Dashboard({ darkMode }) {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* ستون سمت چپ: ورودی وزن و سن + وضعیت همودینامیک */}
+        {/* ستون سمت چپ */}
         <div className="lg:col-span-1 space-y-6">
           <div
             className={`p-4 rounded-lg shadow ${
@@ -121,8 +139,9 @@ export default function Dashboard({ darkMode }) {
               />
             </div>
           </div>
+
           <div>
-            <label className=" text-sm font-medium mb-1 flex items-center">
+            <label className="text-sm font-medium mb-1 flex items-center">
               <FaNotesMedical className="mr-1" />
               تشخیص اولیه
             </label>
@@ -164,7 +183,7 @@ export default function Dashboard({ darkMode }) {
           <HemodynamicStatus parameters={parameters} darkMode={darkMode} />
         </div>
 
-        {/* ستون وسط: پارامترهای همودینامیک */}
+        {/* ستون وسط */}
         <div className="lg:col-span-1 space-y-6">
           <div
             className={`p-4 rounded-lg shadow ${
@@ -185,7 +204,7 @@ export default function Dashboard({ darkMode }) {
           </div>
         </div>
 
-        {/* ستون سمت راست: راهنمای درمان */}
+        {/* ستون راست */}
         <div className="lg:col-span-1 space-y-6">
           <TreatmentGuide
             parameters={parameters}

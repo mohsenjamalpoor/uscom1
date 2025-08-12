@@ -2,7 +2,11 @@ import { useMemo } from 'react';
 
 export default function useHemodynamic(parameters, patientAge) {
   return useMemo(() => {
-    const getParam = (name) => parameters.find(p => p.title.includes(name))?.value || 0;
+    const getParam = (name) => {
+      const param = parameters.find(p => p.title.includes(name));
+      // اگر مقدار خالی بود، null برگردان
+      return param && param.value !== "" ? parseFloat(param.value) : null;
+    };
     
     // پارامترهای اصلی
     const md = getParam('Minute Distance');
@@ -15,6 +19,20 @@ export default function useHemodynamic(parameters, patientAge) {
     const hr = getParam('Heart Rate');
     const map = getParam('MAP');
     const do2 = getParam('DO2');
+    
+    // بررسی آیا تمام پارامترهای ضروری وارد شده‌اند
+    const essentialParams = [md, svr, ci, smii, ftc];
+    const allEssentialEntered = essentialParams.every(val => val !== null);
+    
+    // اگر پارامترهای ضروری وارد نشده‌اند، وضعیت معلق برگردان
+    if (!allEssentialEntered) {
+      return {
+        status: { type: 'Pending', text: 'منتظر ورود داده‌ها' },
+        issues: [],
+        parameters: { md, svr, ci, smii, ftc, spO2, sv, hr, map, do2 },
+        normalRanges: {}
+      };
+    }
     
     // تعیین محدوده نرمال بر اساس سن
     const isNeonate = patientAge?.ageYears === 0 && patientAge?.ageMonths < 1;
@@ -48,18 +66,11 @@ export default function useHemodynamic(parameters, patientAge) {
     if (smii > 2.0) issues.push('افزایش اینوتروپی');
     if (ftc < 330) issues.push('کمبود حجم (هایپوولمی)');
     if (ftc > 440) issues.push('حجم بیش از حد (هایپرولمی)');
-    if (spO2 < 92) issues.push('هیپوکسمی');
-    if (map < 65) issues.push('هیپوتانسیون');
-    if (map > 110) issues.push('هایپرتانسیون');
     
-    // ارزیابی نسبت SV/SVR
-    const svrRatio = sv / svr;
-    if (svrRatio < 0.04) issues.push('افزایش بار بعدی قلب');
-    if (svrRatio > 0.08) issues.push('کاهش بار بعدی قلب');
-    
-    // ارزیابی اکسیژن رسانی
-    const do2i = do2 / (patientAge?.weight || 70);
-    if (do2i < 400) issues.push('کاهش اکسیژن رسانی بافتی');
+    // سایر بررسی‌ها فقط اگر مقادیر موجود باشند
+    if (spO2 !== null && spO2 < 92) issues.push('هیپوکسمی');
+    if (map !== null && map < 65) issues.push('هیپوتانسیون');
+    if (map !== null && map > 110) issues.push('هایپرتانسیون');
     
     return {
       status,
@@ -74,8 +85,7 @@ export default function useHemodynamic(parameters, patientAge) {
         sv,
         hr,
         map,
-        do2,
-        do2i
+        do2
       },
       normalRanges: {
         md: normalMdRange,

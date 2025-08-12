@@ -12,6 +12,7 @@ import {
 import useHemodynamic from '../hooks/useHemodynamic';
 
 export default function TreatmentGuide({ parameters, patient, darkMode }) {
+  
   const { 
     status, 
     parameters: { 
@@ -27,16 +28,21 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
     } 
   } = useHemodynamic(parameters);
 
+  // بررسی معتبر بودن وزن بیمار
+  const isValidWeight = () => {
+    const weight = parseFloat(patient.weight);
+    return !isNaN(weight) && weight > 0;
+  };
+
   const calculateDose = (doseRange) => {
+    if (!isValidWeight()) return null;
+
     const cleanRange = doseRange.replace(/[^\d\-\.]/g, '');
     const [minStr, maxStr] = cleanRange.split('-');
     const min = parseFloat(minStr);
     const max = parseFloat(maxStr);
 
     const patientWeight = parseFloat(patient.weight);
-    if (isNaN(patientWeight)) return { min: "?", max: "?" };
-    if (patientWeight <= 0) return null;
-
     const minDose = min * patientWeight;
     const maxDose = max * patientWeight;
 
@@ -53,7 +59,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
   };
 
   const getDoseText = (dose, unit) => {
-    if (!dose) return "وزن بیمار نامشخص";
+    if (!dose) return "وزن بیمار را وارد کنید";
     return `${dose.min} - ${dose.max} ${unit}`;
   };
 
@@ -361,7 +367,7 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
           }`}>
             <div className="flex items-center mb-3">
               {icon}
-              <h3 className="text-lg font-semibold ml-2">{title}</h3>
+              <h3 className="text-lg text-blue-500 font-semibold ml-2">{title}</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -376,7 +382,9 @@ export default function TreatmentGuide({ parameters, patient, darkMode }) {
               </div>
               <div>
                 <p className="text-sm text-gray-500">دوز پیشنهادی</p>
-                <p className="font-medium">{recommendation.dose}</p>
+                <p className="font-medium">
+                  {recommendation.dose}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">دلیل</p>

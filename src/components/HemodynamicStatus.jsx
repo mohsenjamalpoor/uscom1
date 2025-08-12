@@ -1,8 +1,27 @@
 import useHemodynamic from '../hooks/useHemodynamic';
- 
+
 export default function HemodynamicStatus({ parameters, darkMode }) {
   const { status, issues } = useHemodynamic(parameters);
- 
+  
+  // اگر وضعیت معلق است، پیام مناسب نمایش دهید
+  if (status.type === 'Pending') {
+    return (
+      <div className={`rounded-lg shadow-md overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
+        <div className={`p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+          <h2 className="text-xl font-bold">وضعیت همودینامیک</h2>
+        </div>
+        
+        <div className="p-4">
+          <div className="flex items-center justify-center p-4 rounded-lg mb-4 bg-blue-100 text-blue-800">
+            <span className="text-lg font-bold">{status.text}</span>
+          </div>
+          
+          <p className="text-center">لطفاً پارامترهای ضروری را وارد نمایید</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={`rounded-lg shadow-md overflow-hidden ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
       <div className={`p-4 ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
@@ -34,4 +53,3 @@ export default function HemodynamicStatus({ parameters, darkMode }) {
     </div>
   );
 }
- 

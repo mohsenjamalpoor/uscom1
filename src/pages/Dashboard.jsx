@@ -161,20 +161,16 @@ useEffect(() => {
                 <option value="شوک کاردیوژنیک">شوک کاردیوژنیک</option>
                 <option value="شوک هیپوولمیک">شوک هیپوولمیک</option>
                 <option value="شوک آنافیلاکتیک">شوک آنافیلاکتیک</option>
-                <option value="شوک نوروژنیک">شوک نوروژنیک</option>
+               
               </optgroup>
-              <optgroup label="اختلالات همودینامیک">
-                <option value="هایپرتانسیون ریوی">هایپرتانسیون ریوی</option>
-                <option value="نارسایی قلبی چپ">نارسایی قلبی چپ</option>
-                <option value="نارسایی قلبی راست">نارسایی قلبی راست</option>
-                <option value="تامپوناد قلبی">تامپوناد قلبی</option>
-                <option value="آمبولی ریوی">آمبولی ریوی</option>
-              </optgroup>
+              
               <optgroup label="دیگر شرایط">
                 <option value="دیس ریتمی قلبی">دیس ریتمی قلبی</option>
-                <option value="کاردیومیوپاتی">کاردیومیوپاتی</option>
+                <option value="کاردیومیوپاتی">میوکاردیت</option>
                 <option value="هایپوکسی بافتی">هایپوکسی بافتی</option>
                 <option value="اسیدوز متابولیک">اسیدوز متابولیک</option>
+                <option value="اسیدوز متابولیک">کاهش پرفیوژن کلیه </option>
+
                 <option value="دیگر">سایر موارد</option>
               </optgroup>
             </select>

@@ -38,7 +38,7 @@ export default function Header({ darkMode, setDarkMode }) {
           </Link>
         </nav>
         <Link to="/" className="flex items-center space-x-2">
-          <span className=" ml-2 text-xl font-bold">USCOM Monitor</span>
+          <span className=" ml-2 text-xl font-bold">USCOM</span>
 
           <img src="/Uscom-logo.svg" alt="USCOM Logo" className="w-8 h-8" />
         </Link>
